@@ -7,12 +7,17 @@ let users = [];
 
 io.on("connection", socket => {
   console.log("user connected", socket.id, socket.handshake.address);
-  users.push(socket.id);
   io.emit("users", users);
+
+  socket.on("adduser", function(user) {
+    users.push(user);
+    io.emit("users", users);
+    console.log(users);
+  });
 
   socket.on("disconnect", function() {
     users = users.filter(value => {
-      return value != socket.id;
+      return value.userId != socket.id;
     });
     io.emit("users", users);
   });
