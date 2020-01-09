@@ -13,6 +13,9 @@ io.on("connection", socket => {
     users.push(user);
     io.emit("users", users);
     console.log(users);
+    if (user.role === "csr") {
+      socket.join("support");
+    }
   });
 
   socket.on("disconnect", function() {
@@ -25,6 +28,14 @@ io.on("connection", socket => {
   socket.on("message", message => {
     console.log("message", message);
     io.emit("message", { type: "new-message", text: message });
+  });
+
+  socket.on("support", data => {
+    users.forEach(function(user) {
+      if (user.role === "csr") {
+        io.to(user.userId).emit("support", data);
+      }
+    });
   });
 
   socket.on("communicate", data => {
